@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社内AIアシスタント</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .chatbox { border: 1px solid #ccc; padding: 1em; height: 400px; overflow-y: scroll; margin-bottom: 1em; }
+        .user-message { text-align: right; color: blue; }
+        .ai-message { text-align: left; color: green; }
+        #userInput { width: calc(100% - 70px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>社内AIアシスタント</h1>
+        <div class="chatbox" id="chatbox"></div>
+        <input type="text" id="userInput" placeholder="質問を入力してください...">
+        <button onclick="sendMessage()">送信</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const message = userInput.value;
+            if (!message) return;
+
+            const chatbox = document.getElementById('chatbox');
+            
+            // ユーザーのメッセージを表示
+            const userDiv = document.createElement('div');
+            userDiv.className = 'user-message';
+            userDiv.innerText = message;
+            chatbox.appendChild(userDiv);
+
+            userInput.value = '';
+
+            // AIからの応答を取得
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message })
+            });
+            const data = await response.json();
+            const aiMessage = data.response;
+
+            // AIのメッセージをMarkdownとしてレンダリングして表示
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'ai-message';
+            aiDiv.innerHTML = marked.parse(aiMessage); // marked.jsでMarkdownをHTMLに変換
+            chatbox.appendChild(aiDiv);
+
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
