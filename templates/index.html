@@ -50,7 +50,14 @@
             // AIのメッセージをMarkdownとしてレンダリングして表示
             const aiDiv = document.createElement('div');
             aiDiv.className = 'ai-message';
-            aiDiv.innerHTML = marked.parse(aiMessage); // marked.jsでMarkdownをHTMLに変換
+            
+            // markedの設定（gfm: true はデフォルトですが明示）
+            marked.setOptions({
+                gfm: true,
+                breaks: true
+            });
+            
+            aiDiv.innerHTML = marked.parse(aiMessage);
             chatbox.appendChild(aiDiv);
 
             chatbox.scrollTop = chatbox.scrollHeight;
